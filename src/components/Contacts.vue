@@ -1,41 +1,12 @@
 <template>
-  <div class="hello">
-    <h1 class="ml-3">Contatos</h1>
-    <div class="holder">
-    
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary ml-3 mb-3" data-toggle="modal" data-target="#contactModal">Novo contato</button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="contactModalLabel">Novo Contato</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label for="newName">Nome</label>
-                <input type="text" class="form-control" id="newName" placeholder="Nome" v-model="newName">
-              </div>
-              <div class="form-group">
-                <label for="newEmail">Email</label>
-                <input type="text" class="form-control" id="newEmail" placeholder="Email" v-model="newEmail">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary" v-on:click="saveContact()" data-dismiss="modal">Salvar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  <div>
+    <h1>Contatos</h1>
+    <b-form inline>
+      <b-input class="mb-2 mr-sm-2 mb-sm-0" id="newName" placeholder="Name" v-model="newName"/>
+      <b-input class="mb-2 mr-sm-2 mb-sm-0" id="newEmail" placeholder="Email" v-model="newEmail"/>
+      <b-button variant="primary" v-on:click="addContact()">Inserir</b-button>
+    </b-form>
+    <br>
     <table class="table table-striped table-condensed" cellspacing="0" cellpadding="0">
       <thead>
         <tr>
@@ -45,38 +16,58 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(contact, index) in contacts" :key='index'>
+        <tr v-for="(contact, index) in contacts" :key="index">
           <td>{{ contact.name }}</td>
           <td>{{ contact.email }}</td>
           <td>
-            <button type="button" class="btn btn-warning btn-xs mr-3" v-b-modal.modal1 v-on:click="editEmployee(index)">Editar</button>
-            <button type="button" class="btn btn-danger btn-xs" v-on:click="deleteEmployee(index)">Excluir</button>
+            <button type="button" class="btn btn-warning btn-xs mr-2" v-b-modal.modal1 v-on:click="editContact(index)">Editar</button>
+            <button type="button" class="btn btn-danger btn-xs" v-on:click="deleteContact(index)">Excluir</button>
           </td>
         </tr>
       </tbody>
-      </table>
+    </table>
 
-  
-
-    </div>
+    <b-modal id="modal1" title="Editar funcionário" @ok="saveContact(index)">
+      <input type="text" class="form-control" name="name" id="name" placeholder="Name"><br>
+      <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+    </b-modal>
   </div>
+  
 </template>
 
 <script>
 import contacts from '../static/contacts.json'
 export default {
-  name: 'Contacts',
-  data(){
+
+  data () {
     return {
+      index: null,
       newName: null,
       newEmail: null,
       contacts: contacts
     }
   },
   methods: {
-    saveContact() {
-      this.contacts.push({ name: this.newName.trim(), email: this.newName.trim() })
-      
+    addContact: function () {
+      if (!this.newName.trim() || !this.newEmail.trim()) { return }
+      this.contacts.push(
+        { name: this.newName.trim(), email: this.newEmail.trim() }
+      )
+      this.newName = ''
+      this.newEmail = ''
+    },
+    deleteContact: function (index) {
+      contacts.splice(index, 1)
+    },
+    editContact: function (index) {
+      // alert(contacts[index].name)
+      this.index = index
+      document.querySelector('input[name=name]').value = contacts[index].name
+      document.querySelector('input[name=email]').value = contacts[index].email
+    },
+    saveContact: function () {
+      contacts[this.index].name = document.querySelector('input[name=name]').value
+      contacts[this.index].email = document.querySelector('input[name=email]').value
     }
   }
 }
@@ -84,5 +75,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>
